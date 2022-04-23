@@ -14,7 +14,7 @@ A vnc-ros-gnome image (inspired by and built upon from this [image](https://gith
 
 ### Running the container
 
-1. Change the `extra-hosts` directive to your robot's hostname and IP address (e.g. "robotont-7:192.168.0.39")
+1. Change the `extra-hosts` directive in the docker-compose.yaml to your robot's hostname and IP address (e.g. "robotont-7:192.168.0.39")
 
 2. `docker-compose up`
 
