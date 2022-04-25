@@ -19,3 +19,9 @@ A vnc-ros-gnome image (inspired by and built upon from this [image](https://gith
 2. `docker-compose up`
 
 3. All the ports of the container are shared with the host in the "host" network mode. Connect to port 5901 of your machine via any VNC client to connect to the container
+
+
+# Acknowledgments
+
+Completed with the support by IT Acadamy Programme of Education and Youth Board of Estonia.
+Valminud Haridus- ja Noorteameti IT Akadeemia programmi toel.
