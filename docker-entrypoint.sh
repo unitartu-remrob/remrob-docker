@@ -10,9 +10,11 @@ chown $USER:$USER $HOME/.vnc/passwd
 
 # Import docker-compose env into user domain
 echo "ROS_MASTER=${ROS_MASTER}" >> $HOME/.env
+echo "VGL_DISPLAY=${VGL_DISPLAY}" >> $HOME/.env
 
 # Source the env and set ROS_MASTER in user .bashrc accordingly
 # -------------------------------------------------------------------
+# echo 'vglrun /bin/bash' >> $HOME/.bashrc # Enable VirtualGL on every instance
 echo 'source /.env.sh' >> $HOME/.bashrc # This will source the env file with every new terminal instance
 echo 'export ROS_MASTER_URI=http://${ROS_MASTER}:11311' >> $HOME/.bashrc
 
