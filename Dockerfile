@@ -161,6 +161,9 @@ RUN sudo chown -R $USER:$USER $HOME
 
 RUN echo 'source /opt/ros/noetic/setup.bash' >> $HOME/.bashrc
 RUN echo 'source ${HOME}/catkin_ws/devel/setup.bash' >> $HOME/.bashrc
+ # This will source the env file with every new terminal instance
+RUN echo 'source /.env.sh' >> $HOME/.bashrc
+RUN echo 'export ROS_MASTER_URI=http://localhost:11311' >> $HOME/.bashrc
 
 # switch back to root to start systemd
 USER root
@@ -173,6 +176,7 @@ EXPOSE 5902
 # COPY xorg.conf /etc/X11/xorg.conf
 COPY docker-entrypoint.sh /.docker-entrypoint.sh
 COPY env.sh /.env.sh
+
 
 
 # COPY custom.conf /etc/gdm3/custom.conf
