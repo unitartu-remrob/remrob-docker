@@ -85,6 +85,19 @@ ENV DISPLAY=:2
 RUN systemctl enable tigervnc@:2
 
 # =================================================================
+# RUN yes | unminimize
+RUN apt-get update -y \
+    && apt-get install -y --no-install-recommends \
+        net-tools \
+        iputils-ping \
+        traceroute \
+        vim \
+        nano \
+        gnome-tweaks \
+        gnome-shell-extensions \
+        sudo \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 
 # ROS dependencies for Robotont   
@@ -99,38 +112,22 @@ RUN apt-get update -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update -y \
-    && apt-get install -y --no-install-recommends \
-        net-tools \
-        iputils-ping \
-        traceroute \
-        vim \
-        nano \
-        gnome-tweaks \
-        gnome-shell-extensions \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
 # Create unprivileged user
 # NOTE user hardcoded in tigervnc.service
 # NOTE alternative is to use libnss_switch and create user at runtime -> use entrypoint script
 ARG UID=1000
 ARG USER=kasutaja
+ARG PASSWD=remrob
 RUN useradd ${USER} -u ${UID} -U -d /home/${USER} -m -s /bin/bash && \
     groupadd vglusers && \
     usermod -aG vglusers ${USER}
-    
-# RUN echo "$USER:password" | chpasswd
-RUN apt-get update && apt-get install -y sudo && apt-get clean && rm -rf /var/lib/apt/lists/* && \
-    echo "${USER} ALL=(ALL) NOPASSWD: ALL" > "/etc/sudoers.d/${USER}" && \
-    chmod 440 "/etc/sudoers.d/${USER}"
 
+RUN echo "${USER}:${PASSWD}" | chpasswd
 ENV USER="${USER}" \
     HOME="/home/${USER}"
 USER "${USER}"
-
-
 WORKDIR "/home/${USER}"
+
 # Set up VNC
 RUN mkdir -p $HOME/.vnc
 COPY xstartup $HOME/.vnc/xstartup
@@ -150,23 +147,28 @@ RUN source /opt/ros/${ROS_DISTRO}/setup.bash && \
     catkin init && \
     catkin build
 
-RUN sudo apt update
+RUN echo $PASSWD sudo -S apt update
 
 # GNOME customized config
 COPY user $HOME/.config/dconf/user
 COPY img/wallpaper.png $HOME/Pictures/Wallpapers/
 
 #RUN sudo chmod 777 "${HOME}/.config/dconf"
-RUN sudo chown -R $USER:$USER $HOME
+#RUN echo $PASSWD sudo -S chown -R $USER:$USER $HOME
 
-RUN echo 'source /opt/ros/noetic/setup.bash' >> $HOME/.bashrc
-RUN echo 'source ${HOME}/catkin_ws/devel/setup.bash' >> $HOME/.bashrc
- # This will source the env file with every new terminal instance
-RUN echo 'source /.env.sh' >> $HOME/.bashrc
-RUN echo 'export ROS_MASTER_URI=http://localhost:11311' >> $HOME/.bashrc
+# sudo and VirtualGL compatibility: https://groups.google.com/g/virtualgl-users/c/It-4AmVw6qA (Hide error outputs)
+RUN echo "alias sudo='env -u LD_PRELOAD sudo'" >> $HOME/.bashrc
+RUN echo "alias ping='env -u LD_PRELOAD ping'" >> $HOME/.bashrc
+# This will source the env file with every new terminal instance
+RUN echo "source /.env.sh" >> $HOME/.bashrc
+
+RUN echo "source /opt/ros/noetic/setup.bash" >> $HOME/.bashrc
+RUN echo "source ${HOME}/catkin_ws/devel/setup.bash" >> $HOME/.bashrc
+RUN echo "export ROS_MASTER_URI=http://localhost:11311" >> $HOME/.bashrc
 
 # switch back to root to start systemd
 USER root
+RUN chown -R $USER:$USER $HOME
 
 EXPOSE 5902
 
@@ -176,8 +178,6 @@ EXPOSE 5902
 # COPY xorg.conf /etc/X11/xorg.conf
 COPY docker-entrypoint.sh /.docker-entrypoint.sh
 COPY env.sh /.env.sh
-
-
 
 # COPY custom.conf /etc/gdm3/custom.conf
 # COPY xserverrc /etc/X11/xinit/xserverrc
