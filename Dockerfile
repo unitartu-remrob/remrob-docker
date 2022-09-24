@@ -194,8 +194,8 @@ RUN echo "source /.env.sh" >> $HOME/.bashrc
 
 # Bash aliases
 RUN touch "${HOME}/.bash_aliases"
-RUN echo "alias submit_code='source ${HOME}/.git_scripts/inside_push.sh"
-RUN echo "alias undo_changes='source ${HOME}/.git_scripts/inside_reclone.sh"
+RUN echo "alias submit_code='source ${HOME}/.git_scripts/inside_push.sh" >> ${HOME}/.bash_aliases
+RUN echo "alias undo_changes='source ${HOME}/.git_scripts/inside_reclone.sh" >> ${HOME}/.bash_aliases
 
 RUN echo "source /opt/ros/noetic/setup.bash" >> $HOME/.bashrc
 RUN echo "source ${HOME}/catkin_ws/devel/setup.bash" >> $HOME/.bashrc
