@@ -99,6 +99,13 @@ RUN apt-get update -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Screen recording
+RUN apt-get update -y \
+    && apt-get install -y --no-install-recommends \
+        ffmpeg \
+        gir1.2-appindicator3-0.1 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # ROS dependencies for Robotont   
 RUN apt-get update -y \
@@ -111,6 +118,10 @@ RUN apt-get update -y \
         ros-${ROS_DISTRO}-tf \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+# Hide update notification:
+# =================================================================
+RUN echo "Hidden=true" >> /etc/xdg/autostart/update-notifier.desktop
 
 # Create unprivileged user
 # NOTE user hardcoded in tigervnc.service
@@ -132,6 +143,25 @@ WORKDIR "/home/${USER}"
 RUN mkdir -p $HOME/.vnc
 COPY xstartup $HOME/.vnc/xstartup
 # RUN echo "password" | vncpasswd -f >> $HOME/.vnc/passwd && chmod 600 $HOME/.vnc/passwd
+
+# =================================================================
+# Screen recording applet
+# =================================================================
+COPY remrob-recorder/video_recorder.py ${HOME}/.local/share/applications/video_recorder.py
+# RUN (crontab -l 2>/dev/null; echo "@reboot python3 ${HOME}/.local/share/applications/video_recorder.py --saving_path=/home/kasutaja &") | crontab -
+# COPY remrob-recorder ${HOME}/.local/share/applications/remrob-recorder
+# RUN mkdir -p ${HOME}/.config/systemd/user
+# COPY recorderd/screen_recorder.service ${HOME}/.config/systemd/user/screen_recorder.service
+# COPY recorderd/xsession.target ${HOME}/.config/systemd/user/xsession.target
+# COPY recorderd/xsessionrc ${HOME}/.xsessionrc
+# #RUN echo $PASSWD sudo -S systemctl enable screen_recorder
+# #RUN echo $PASSWD sudo -S systemctl daemon-reload
+# RUN systemctl --user enable screen_recorder.service
+# =================================================================
+
+# Git pushing scripts:
+RUN mkdir -p $HOME/.git_scripts
+COPY git_mod/* $HOME/.git_scripts/
 
 SHELL ["/bin/bash", "-c"]
 
@@ -161,6 +191,11 @@ RUN echo "alias sudo='env -u LD_PRELOAD sudo'" >> $HOME/.bashrc
 RUN echo "alias ping='env -u LD_PRELOAD ping'" >> $HOME/.bashrc
 # This will source the env file with every new terminal instance
 RUN echo "source /.env.sh" >> $HOME/.bashrc
+
+# Bash aliases
+RUN touch "${HOME}/.bash_aliases"
+RUN echo "alias submit_code='source ${HOME}/.git_scripts/inside_push.sh"
+RUN echo "alias undo_changes='source ${HOME}/.git_scripts/inside_reclone.sh"
 
 RUN echo "source /opt/ros/noetic/setup.bash" >> $HOME/.bashrc
 RUN echo "source ${HOME}/catkin_ws/devel/setup.bash" >> $HOME/.bashrc
