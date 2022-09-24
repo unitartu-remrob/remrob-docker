@@ -115,9 +115,7 @@ RUN apt-get update -y \
         ros-${ROS_DISTRO}-joy \
         ros-${ROS_DISTRO}-teleop-twist-keyboard \
         ros-${ROS_DISTRO}-serial \
-        ros-${ROS_DISTRO}-tf \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+        ros-${ROS_DISTRO}-tf
 
 # Hide update notification:
 # =================================================================
@@ -174,8 +172,6 @@ WORKDIR $HOME/catkin_ws
 RUN source /opt/ros/${ROS_DISTRO}/setup.bash && \
     catkin init && \
     catkin build
-
-RUN echo $PASSWD sudo -S apt update
 
 # GNOME customized config
 COPY user $HOME/.config/dconf/user
