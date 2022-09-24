@@ -10,5 +10,5 @@ then
 echo "Aborting."
 exit 0
 fi
-curl --location --request GET "http://192.168.200.201:5000/api/v1/reclone?token=$GIT_PAT&force=true"
+curl --location --request GET "http://192.168.200.201/api/v1/reclone?token=$GIT_PAT&force=true"
 echo ""
