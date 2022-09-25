@@ -117,6 +117,10 @@ RUN apt-get update -y \
         ros-${ROS_DISTRO}-serial \
         ros-${ROS_DISTRO}-tf
 
+RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
+    && dpkg -i google-chrome-stable_current_amd64.deb \
+    && rm google-chrome-stable_current_amd64.deb
+
 # Hide update notification:
 # =================================================================
 RUN echo "Hidden=true" >> /etc/xdg/autostart/update-notifier.desktop
@@ -176,6 +180,13 @@ RUN source /opt/ros/${ROS_DISTRO}/setup.bash && \
 # GNOME customized config
 COPY user $HOME/.config/dconf/user
 COPY img/wallpaper.png $HOME/Pictures/Wallpapers/
+
+# Camera shortcut
+COPY img/camera.png $HOME/Pictures/camera.png
+COPY cam.desktop $HOME/.local/share/applications/cam.desktop
+COPY cam.desktop $HOME/Desktop/cam.desktop
+
+COPY launch_camera.sh $HOME/.launch_camera.sh
 
 #RUN sudo chmod 777 "${HOME}/.config/dconf"
 #RUN echo $PASSWD sudo -S chown -R $USER:$USER $HOME

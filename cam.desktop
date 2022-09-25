@@ -1,0 +1,7 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Name=Robotont camera stream
+Type=Application
+Exec=bash -c "cd /home/kasutaja && source /.env.sh && /home/kasutaja/.launch_camera.sh"
+Terminal=false
+Icon=/home/kasutaja/Pictures/camera.png
