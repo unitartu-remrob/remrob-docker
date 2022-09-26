@@ -149,7 +149,6 @@ COPY xstartup $HOME/.vnc/xstartup
 # =================================================================
 # Screen recording applet
 # =================================================================
-COPY remrob-recorder/video_recorder.py ${HOME}/.local/share/applications/video_recorder.py
 # RUN (crontab -l 2>/dev/null; echo "@reboot python3 ${HOME}/.local/share/applications/video_recorder.py --saving_path=/home/kasutaja &") | crontab -
 # COPY remrob-recorder ${HOME}/.local/share/applications/remrob-recorder
 # RUN mkdir -p ${HOME}/.config/systemd/user
@@ -160,8 +159,6 @@ COPY remrob-recorder/video_recorder.py ${HOME}/.local/share/applications/video_r
 # #RUN echo $PASSWD sudo -S systemctl daemon-reload
 # RUN systemctl --user enable screen_recorder.service
 # =================================================================
-
-
 
 SHELL ["/bin/bash", "-c"]
 
@@ -187,6 +184,12 @@ COPY cam.desktop $HOME/.local/share/applications/cam.desktop
 COPY cam.desktop $HOME/Desktop/cam.desktop
 
 COPY launch_camera.sh $HOME/.launch_camera.sh
+
+# RUN mkdir -p $HOME/.config/autostart
+COPY video_recorder.py ${HOME}/.local/share/applications/video_recorder.py
+RUN mkdir $HOME/submission_videos
+COPY img/record.png $HOME/Pictures/record.png
+COPY recorder.desktop $HOME/.local/share/applications/recorder.desktop
 
 #RUN sudo chmod 777 "${HOME}/.config/dconf"
 #RUN echo $PASSWD sudo -S chown -R $USER:$USER $HOME

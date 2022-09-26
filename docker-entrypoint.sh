@@ -19,11 +19,13 @@ sed -i '/ROS_MASTER_URI/c\export ROS_MASTER_URI=http://${ROS_MASTER}:11311' $HOM
 # Set primitive sudo restrictions, these don't really prevent anything, just basic emulation of a regular system for UX
 echo "${USER} ALL=(ALL) NOPASSWD: ALL, !/bin/su, !/bin/bash, !/bin/sh" > "/etc/sudoers.d/${USER}"
 
-#/usr/bin/python3 $HOME/.local/share/applications/video_recorder.py &
-
 gio set $HOME/Desktop/cam.desktop metadata::trusted true
 chmod a+x $HOME/Desktop/cam.desktop
 chmod +x $HOME/.launch_camera.sh
+
+# gio set $HOME/Desktop/recorder.desktop metadata::trusted true
+# chmod a+x $HOME/Desktop/recorder.desktop
+chmod +x $HOME/.local/share/applications/video_recorder.py
 
 #google-chrome "http://remrob.ut.ee/cam/webrtcstreamer.html?video=Remrob%20field%20%231&options=rtptransport%3Dtcp%26timeout%3D60&"
 
