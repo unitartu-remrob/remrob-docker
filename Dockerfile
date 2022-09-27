@@ -104,8 +104,12 @@ RUN apt-get update -y \
     && apt-get install -y --no-install-recommends \
         ffmpeg \
         gir1.2-appindicator3-0.1 \
+        kazam \
+        vlc \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+COPY kazam.desktop /usr/share/applications/kazam.desktop
 
 # ROS dependencies for Robotont   
 RUN apt-get update -y \
@@ -186,10 +190,10 @@ COPY cam.desktop $HOME/Desktop/cam.desktop
 COPY launch_camera.sh $HOME/.launch_camera.sh
 
 # RUN mkdir -p $HOME/.config/autostart
-COPY video_recorder.py ${HOME}/.local/share/applications/video_recorder.py
-RUN mkdir $HOME/submission_videos
-COPY img/record.png $HOME/Pictures/record.png
-COPY recorder.desktop $HOME/.local/share/applications/recorder.desktop
+# COPY video_recorder.py ${HOME}/.local/share/applications/video_recorder.py
+# RUN mkdir $HOME/submission_videos
+# COPY img/record.png $HOME/Pictures/record.png
+# COPY recorder.desktop $HOME/.local/share/applications/recorder.desktop
 
 #RUN sudo chmod 777 "${HOME}/.config/dconf"
 #RUN echo $PASSWD sudo -S chown -R $USER:$USER $HOME

@@ -23,11 +23,16 @@ gio set $HOME/Desktop/cam.desktop metadata::trusted true
 chmod a+x $HOME/Desktop/cam.desktop
 chmod +x $HOME/.launch_camera.sh
 
+sed -n '
+1i[Default Applications]
+/^video/{
+s/Totem/vlc/
+s/org\.gnome\.//p
+}' /usr/share/applications/defaults.list > $HOME/.local/share/applications/defaults.list
+
 # gio set $HOME/Desktop/recorder.desktop metadata::trusted true
 # chmod a+x $HOME/Desktop/recorder.desktop
-chmod +x $HOME/.local/share/applications/video_recorder.py
-
-#google-chrome "http://remrob.ut.ee/cam/webrtcstreamer.html?video=Remrob%20field%20%231&options=rtptransport%3Dtcp%26timeout%3D60&"
+# chmod +x $HOME/.local/share/applications/video_recorder.py
 
 exec "$@"
 
