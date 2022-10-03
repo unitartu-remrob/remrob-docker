@@ -182,6 +182,9 @@ RUN source /opt/ros/${ROS_DISTRO}/setup.bash && \
 COPY user $HOME/.config/dconf/user
 COPY img/wallpaper.png $HOME/Pictures/Wallpapers/
 
+# Kazam config (force default h264mp4)
+COPY kazam.conf $HOME/.config/kazam/kazam.conf
+
 # Camera shortcut
 COPY img/camera.png $HOME/Pictures/camera.png
 COPY cam.desktop $HOME/.local/share/applications/cam.desktop
