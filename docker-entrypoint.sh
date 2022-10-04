@@ -19,8 +19,8 @@ sed -i '/ROS_MASTER_URI/c\export ROS_MASTER_URI=http://${ROS_MASTER}:11311' $HOM
 # Set primitive sudo restrictions, these don't really prevent anything, just basic emulation of a regular system for UX
 echo "${USER} ALL=(ALL) NOPASSWD: ALL, !/bin/su, !/bin/bash, !/bin/sh" > "/etc/sudoers.d/${USER}"
 
-gio set $HOME/Desktop/cam.desktop metadata::trusted true
-chmod a+x $HOME/Desktop/cam.desktop
+#gio set $HOME/Desktop/cam.desktop metadata::trusted true
+#chmod a+x $HOME/Desktop/cam.desktop
 chmod +x $HOME/.launch_camera.sh
 
 sed -n '

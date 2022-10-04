@@ -188,7 +188,7 @@ COPY kazam.conf $HOME/.config/kazam/kazam.conf
 # Camera shortcut
 COPY img/camera.png $HOME/Pictures/camera.png
 COPY cam.desktop $HOME/.local/share/applications/cam.desktop
-COPY cam.desktop $HOME/Desktop/cam.desktop
+#COPY cam.desktop $HOME/Desktop/cam.desktop
 
 COPY launch_camera.sh $HOME/.launch_camera.sh
 
