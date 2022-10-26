@@ -21,7 +21,14 @@ echo "${USER} ALL=(ALL) NOPASSWD: ALL, !/bin/su, !/bin/bash, !/bin/sh" > "/etc/s
 
 #gio set $HOME/Desktop/cam.desktop metadata::trusted true
 #chmod a+x $HOME/Desktop/cam.desktop
-chmod +x $HOME/.launch_camera.sh
+
+if [ $ROBOT_CELL == "null" ]
+then
+	rm $HOME/.local/share/applications/cam.desktop
+else
+	chmod +x $HOME/.launch_camera.sh
+fi
+
 
 sed -n '
 1i[Default Applications]
