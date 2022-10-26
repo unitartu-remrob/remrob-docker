@@ -22,7 +22,3 @@
 [submodule "src/robotont_driver"]
 	path = src/robotont_driver
 	url = https://github.com/robotont/robotont_driver
-[submodule "remrob-recorder"]
-	path = remrob-recorder
-	url = https://github.com/unitartu-remrob/remrob-recorder.git
-	branch = vDocker

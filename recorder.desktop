@@ -1,7 +1,0 @@
-#!/usr/bin/env xdg-open
-[Desktop Entry]
-Name=Recording applet
-Icon=/home/kasutaja/Pictures/record.png
-Exec=bash -c "$HOME/.local/share/applications/video_recorder.py --saving_path=/home/kasutaja/submission_videos"
-Terminal=false
-Type=Application
