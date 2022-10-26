@@ -19,9 +19,6 @@ sed -i '/ROS_MASTER_URI/c\export ROS_MASTER_URI=http://${ROS_MASTER}:11311' $HOM
 # Set primitive sudo restrictions, these don't really prevent anything, just basic emulation of a regular system for UX
 echo "${USER} ALL=(ALL) NOPASSWD: ALL, !/bin/su, !/bin/bash, !/bin/sh" > "/etc/sudoers.d/${USER}"
 
-#gio set $HOME/Desktop/cam.desktop metadata::trusted true
-#chmod a+x $HOME/Desktop/cam.desktop
-
 if [ $ROBOT_CELL == "null" ]
 then
 	rm $HOME/.local/share/applications/cam.desktop
@@ -29,17 +26,12 @@ else
 	chmod +x $HOME/.launch_camera.sh
 fi
 
-
 sed -n '
 1i[Default Applications]
 /^video/{
 s/Totem/vlc/
 s/org\.gnome\.//p
 }' /usr/share/applications/defaults.list > $HOME/.local/share/applications/defaults.list
-
-# gio set $HOME/Desktop/recorder.desktop metadata::trusted true
-# chmod a+x $HOME/Desktop/recorder.desktop
-# chmod +x $HOME/.local/share/applications/video_recorder.py
 
 exec "$@"
 

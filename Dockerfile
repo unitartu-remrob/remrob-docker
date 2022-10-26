@@ -129,6 +129,10 @@ RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd6
 # =================================================================
 RUN echo "Hidden=true" >> /etc/xdg/autostart/update-notifier.desktop
 
+# Set timezone:
+RUN rm -rf /etc/localtime
+RUN ln -s /usr/share/zoneinfo/Europe/Tallinn /etc/localtime
+
 # Create unprivileged user
 # NOTE user hardcoded in tigervnc.service
 # NOTE alternative is to use libnss_switch and create user at runtime -> use entrypoint script
@@ -149,20 +153,6 @@ WORKDIR "/home/${USER}"
 RUN mkdir -p $HOME/.vnc
 COPY xstartup $HOME/.vnc/xstartup
 # RUN echo "password" | vncpasswd -f >> $HOME/.vnc/passwd && chmod 600 $HOME/.vnc/passwd
-
-# =================================================================
-# Screen recording applet
-# =================================================================
-# RUN (crontab -l 2>/dev/null; echo "@reboot python3 ${HOME}/.local/share/applications/video_recorder.py --saving_path=/home/kasutaja &") | crontab -
-# COPY remrob-recorder ${HOME}/.local/share/applications/remrob-recorder
-# RUN mkdir -p ${HOME}/.config/systemd/user
-# COPY recorderd/screen_recorder.service ${HOME}/.config/systemd/user/screen_recorder.service
-# COPY recorderd/xsession.target ${HOME}/.config/systemd/user/xsession.target
-# COPY recorderd/xsessionrc ${HOME}/.xsessionrc
-# #RUN echo $PASSWD sudo -S systemctl enable screen_recorder
-# #RUN echo $PASSWD sudo -S systemctl daemon-reload
-# RUN systemctl --user enable screen_recorder.service
-# =================================================================
 
 SHELL ["/bin/bash", "-c"]
 
@@ -188,15 +178,8 @@ COPY kazam.conf $HOME/.config/kazam/kazam.conf
 # Camera shortcut
 COPY img/camera.png $HOME/Pictures/camera.png
 COPY cam.desktop $HOME/.local/share/applications/cam.desktop
-#COPY cam.desktop $HOME/Desktop/cam.desktop
 
 COPY launch_camera.sh $HOME/.launch_camera.sh
-
-# RUN mkdir -p $HOME/.config/autostart
-# COPY video_recorder.py ${HOME}/.local/share/applications/video_recorder.py
-# RUN mkdir $HOME/submission_videos
-# COPY img/record.png $HOME/Pictures/record.png
-# COPY recorder.desktop $HOME/.local/share/applications/recorder.desktop
 
 #RUN sudo chmod 777 "${HOME}/.config/dconf"
 #RUN echo $PASSWD sudo -S chown -R $USER:$USER $HOME
