@@ -119,7 +119,12 @@ RUN apt-get update -y \
         ros-${ROS_DISTRO}-joy \
         ros-${ROS_DISTRO}-teleop-twist-keyboard \
         ros-${ROS_DISTRO}-serial \
-        ros-${ROS_DISTRO}-tf
+        ros-${ROS_DISTRO}-depthimage-to-laserscan \
+        ros-${ROS_DISTRO}-gmapping \
+        ros-${ROS_DISTRO}-move-base \
+        ros-${ROS_DISTRO}-amcl \
+        ros-${ROS_DISTRO}-map-server
+
 
 RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
     && dpkg -i google-chrome-stable_current_amd64.deb \
