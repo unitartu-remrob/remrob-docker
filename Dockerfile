@@ -195,15 +195,6 @@ RUN echo "alias ping='env -u LD_PRELOAD ping'" >> $HOME/.bashrc
 # This will source the env file with every new terminal instance
 RUN echo "source /.env.sh" >> $HOME/.bashrc
 
-# Bash aliases
-
-# Git pushing scripts:
-RUN mkdir -p $HOME/.git_scripts
-COPY git_mod/* $HOME/.git_scripts/
-
-RUN touch "${HOME}/.bash_aliases"
-RUN echo "alias submit_code='source ${HOME}/.git_scripts/inside_push.sh'" >> ${HOME}/.bash_aliases
-RUN echo "alias undo_changes='source ${HOME}/.git_scripts/inside_reclone.sh'" >> ${HOME}/.bash_aliases
 
 RUN echo "source /opt/ros/noetic/setup.bash" >> $HOME/.bashrc
 RUN echo "source ${HOME}/catkin_ws/devel/setup.bash" >> $HOME/.bashrc
