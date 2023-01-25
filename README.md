@@ -69,6 +69,6 @@ Replace the `user` binary file with your custom binary (found at `~/.config/dcon
 
 # Acknowledgments
 
-Completed with the support by IT Acadamy Programme of Education and Youth Board of Estonia.
+Completed with the support by IT Academy Programme of Education and Youth Board of Estonia.
 
 Valminud Haridus- ja Noorteameti IT Akadeemia programmi toel.
