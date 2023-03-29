@@ -19,7 +19,7 @@ sed -i '/ROS_MASTER_URI/c\export ROS_MASTER_URI=http://${ROS_MASTER}:11311' $HOM
 # Set primitive sudo restrictions, these don't really prevent anything, just basic emulation of a regular system for UX
 echo "${USER} ALL=(ALL) NOPASSWD: ALL, !/bin/su, !/bin/bash, !/bin/sh" > "/etc/sudoers.d/${USER}"
 
-if [ $ROBOT_CELL == "null" ]
+if [[ $ROBOT_CELL == "null" ]]
 then
 	rm $HOME/.local/share/applications/cam.desktop
 else
