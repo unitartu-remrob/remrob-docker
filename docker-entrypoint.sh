@@ -24,6 +24,7 @@ then
 	rm $HOME/.local/share/applications/cam.desktop
 else
 	chmod +x $HOME/.launch_camera.sh
+	chmod +x $HOME/.launch_pip.sh
 fi
 
 sed -n '

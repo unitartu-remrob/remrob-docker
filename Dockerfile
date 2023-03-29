@@ -80,7 +80,7 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 # NOTE logout will stop tigervnc service -> need to manually start (gdm for graphical login is not working)
 
-COPY tigervnc@.service /etc/systemd/system/tigervnc@.service
+COPY services/tigervnc@.service /etc/systemd/system/tigervnc@.service
 ENV DISPLAY=:2
 RUN systemctl enable tigervnc@:2
 
@@ -106,10 +106,11 @@ RUN apt-get update -y \
         gir1.2-appindicator3-0.1 \
         kazam \
         vlc \
+        xdotool \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-COPY kazam.desktop /usr/share/applications/kazam.desktop
+COPY system/kazam.desktop /usr/share/applications/kazam.desktop
 
 # ROS dependencies for Robotont   
 RUN apt-get update -y \
@@ -156,7 +157,7 @@ WORKDIR "/home/${USER}"
 
 # Set up VNC
 RUN mkdir -p $HOME/.vnc
-COPY xstartup $HOME/.vnc/xstartup
+COPY system/xstartup $HOME/.vnc/xstartup
 # RUN echo "password" | vncpasswd -f >> $HOME/.vnc/passwd && chmod 600 $HOME/.vnc/passwd
 
 SHELL ["/bin/bash", "-c"]
@@ -174,17 +175,21 @@ RUN source /opt/ros/${ROS_DISTRO}/setup.bash && \
     catkin build
 
 # GNOME customized config
-COPY user $HOME/.config/dconf/user
+COPY system/user $HOME/.config/dconf/user
 COPY img/wallpaper.png $HOME/Pictures/Wallpapers/
 
 # Kazam config (force default h264mp4)
-COPY kazam.conf $HOME/.config/kazam/kazam.conf
+COPY system/kazam.conf $HOME/.config/kazam/kazam.conf
 
 # Camera shortcut
 COPY img/camera.png $HOME/Pictures/camera.png
-COPY cam.desktop $HOME/.local/share/applications/cam.desktop
+COPY system/cam.desktop $HOME/.local/share/applications/cam.desktop
 
-COPY launch_camera.sh $HOME/.launch_camera.sh
+# COPY terminal.desktop $HOME/.config/autostart/terminal.desktop
+# COPY cam.desktop $HOME/.config/autostart/cam.desktop
+
+COPY scripts/launch_camera.sh $HOME/.launch_camera.sh
+COPY scripts/launch_pip.sh $HOME/.launch_pip.sh
 
 #RUN sudo chmod 777 "${HOME}/.config/dconf"
 #RUN echo $PASSWD sudo -S chown -R $USER:$USER $HOME
@@ -206,12 +211,22 @@ RUN chown -R $USER:$USER $HOME
 
 EXPOSE 5902
 
+# install chrome PiP extension for auto-start
+COPY scripts/chrome_pip_extension.sh $HOME/.ext.sh
+RUN bash $HOME/.ext.sh
+
+COPY services/cam_launch.service /etc/systemd/system/cam_launch.service
+RUN systemctl enable cam_launch.service
+
+# COPY terminal_launch.service /etc/systemd/system/terminal_launch.service
+# RUN systemctl enable terminal_launch.service
+
 # RUN mkdir -p /root/.vnc & mkdir -p /root/.config/autostart
 # COPY startup.desktop /root/.config/autostart/startup.desktop
 
 # COPY xorg.conf /etc/X11/xorg.conf
 COPY docker-entrypoint.sh /.docker-entrypoint.sh
-COPY env.sh /.env.sh
+COPY scripts/env.sh /.env.sh
 
 # COPY custom.conf /etc/gdm3/custom.conf
 # COPY xserverrc /etc/X11/xinit/xserverrc
