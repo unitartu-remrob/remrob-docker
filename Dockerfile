@@ -218,13 +218,15 @@ EXPOSE 5902
 COPY services/cam_launch.service /etc/systemd/system/cam_launch.service
 RUN systemctl enable cam_launch.service
 
-COPY services/prewarm-dbus.service /etc/systemd/system/prewarm-dbus.service
-COPY scripts/prewarm-dbus.sh /usr/local/bin/prewarm-dbus.sh
-# RUN systemctl enable prewarm-dbus.service
 RUN systemctl mask user@1000.service
 
-# COPY services/terminal_launch.service /etc/systemd/system/terminal_launch.service
-# RUN systemctl enable terminal_launch.service
+ARG SCRIPTS=$HOME/.scripts
+RUN mkdir $SCRIPTS
+COPY scripts/welcome_msg.sh $SCRIPTS/welcome_msg.sh
+COPY scripts/print_message.sh $SCRIPTS/print_message.sh
+
+COPY services/terminal_launch.service /etc/systemd/system/terminal_launch.service
+RUN systemctl enable terminal_launch.service
 
 # RUN mkdir -p /root/.vnc & mkdir -p /root/.config/autostart
 # COPY startup.desktop /root/.config/autostart/startup.desktop
