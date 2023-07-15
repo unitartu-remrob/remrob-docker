@@ -1,0 +1,10 @@
+[Unit]
+Description=Pre-warm D-Bus session
+After=dbus.service
+Requires=dbus.service
+
+[Service]
+ExecStart=/usr/local/bin/prewarm-dbus.sh
+
+[Install]
+WantedBy=default.target

@@ -56,7 +56,6 @@ ARG SOURCEFORGE=https://sourceforge.net/projects
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl wget git apt-utils python3-pip less lsof htop gedit gedit-plugins \
     libegl1-mesa mesa-utils \
-    terminator \
     make cmake python x11-xkb-utils xauth xfonts-base xkb-data && \
     rm -rf /var/lib/apt/lists/* && \
     cd /tmp && \
@@ -155,6 +154,7 @@ ENV USER="${USER}" \
 USER "${USER}"
 WORKDIR "/home/${USER}"
 
+
 # Set up VNC
 RUN mkdir -p $HOME/.vnc
 COPY system/xstartup $HOME/.vnc/xstartup
@@ -212,13 +212,18 @@ RUN chown -R $USER:$USER $HOME
 EXPOSE 5902
 
 # install chrome PiP extension for auto-start
-COPY scripts/chrome_pip_extension.sh $HOME/.ext.sh
-RUN bash $HOME/.ext.sh
+# COPY scripts/chrome_pip_extension.sh $HOME/.ext.sh
+# RUN bash $HOME/.ext.sh
 
 COPY services/cam_launch.service /etc/systemd/system/cam_launch.service
 RUN systemctl enable cam_launch.service
 
-# COPY terminal_launch.service /etc/systemd/system/terminal_launch.service
+COPY services/prewarm-dbus.service /etc/systemd/system/prewarm-dbus.service
+COPY scripts/prewarm-dbus.sh /usr/local/bin/prewarm-dbus.sh
+# RUN systemctl enable prewarm-dbus.service
+RUN systemctl mask user@1000.service
+
+# COPY services/terminal_launch.service /etc/systemd/system/terminal_launch.service
 # RUN systemctl enable terminal_launch.service
 
 # RUN mkdir -p /root/.vnc & mkdir -p /root/.config/autostart

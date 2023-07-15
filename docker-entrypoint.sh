@@ -34,5 +34,10 @@ s/Totem/vlc/
 s/org\.gnome\.//p
 }' /usr/share/applications/defaults.list > $HOME/.local/share/applications/defaults.list
 
+# su kasutaja -c "dbus-run-session /usr/bin/gnome-control-center --version > /home/kasutaja/textme_baby.txt"
+# su kasutaja -c "echo 'update' >> /home/kasutaja/textme_baby.txt"
+# su kasutaja -c "dbus-run-session /usr/bin/gnome-control-center"
+# sleep 30
+
 exec "$@"
 
