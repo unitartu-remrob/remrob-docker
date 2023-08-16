@@ -7,7 +7,7 @@ Type=forking
 User=kasutaja
 WorkingDirectory=/home/kasutaja
 
-ExecStartPre=/bin/sleep 3
+ExecStartPre=/bin/sleep 2
 #ExecStart=/bin/bash -c "export DISPLAY=:2 && gnome-terminal -- bash -c 'cd ~ && echo Welcome to Remrob!; exec $SHELL'"
 #ExecStart=/bin/bash -c "export DISPLAY=:2 && cd ~ && source .scripts/welcome_msg.sh"
 ExecStart=/bin/bash .scripts/welcome_msg.sh

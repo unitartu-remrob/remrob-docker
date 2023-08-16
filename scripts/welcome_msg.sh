@@ -2,5 +2,10 @@
 
 export DISPLAY=:2
 
-gnome-terminal -- bash -c 'cd ~ && source .scripts/print_message.sh; exec vglrun $SHELL'
+gnome-terminal -- bash -c '
+  cd $HOME &&
+  source .scripts/print_message.sh &&
+  . /etc/environment;
+  exec vglrun $SHELL
+'
 
