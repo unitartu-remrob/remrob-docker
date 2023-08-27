@@ -200,7 +200,6 @@ RUN echo "alias ping='env -u LD_PRELOAD ping'" >> $HOME/.bashrc
 # This will source the env file with every new terminal instance
 RUN echo "source /.env.sh" >> $HOME/.bashrc
 
-
 RUN echo "source /opt/ros/noetic/setup.bash" >> $HOME/.bashrc
 RUN echo "source ${HOME}/catkin_ws/devel/setup.bash" >> $HOME/.bashrc
 RUN echo "export ROS_MASTER_URI=http://localhost:11311" >> $HOME/.bashrc
@@ -212,8 +211,8 @@ RUN chown -R $USER:$USER $HOME
 EXPOSE 5902
 
 # install chrome PiP extension for auto-start
-# COPY scripts/chrome_pip_extension.sh $HOME/.ext.sh
-# RUN bash $HOME/.ext.sh
+COPY scripts/chrome_pip_extension.sh $HOME/.ext.sh
+RUN bash $HOME/.ext.sh
 
 COPY services/cam_launch.service /etc/systemd/system/cam_launch.service
 RUN systemctl enable cam_launch.service
