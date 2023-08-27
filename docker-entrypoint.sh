@@ -19,10 +19,10 @@ sed -i '/ROS_MASTER_URI/c\export ROS_MASTER_URI=http://${ROS_MASTER}:11311' $HOM
 # Set primitive sudo restrictions, these don't really prevent anything, just basic emulation of a regular system for UX
 echo "${USER} ALL=(ALL) NOPASSWD: ALL, !/bin/su, !/bin/bash, !/bin/sh" > "/etc/sudoers.d/${USER}"
 
-# if [[ $ROBOT_CELL == "null" ]]
 
 # check if ROBOT_CELL is set (for simulation the camrea shortcut should be removed)
-if [ -v ROBOT_CELL ]
+# if [[ -v $ROBOT_CELL ]]
+if [[ $ROBOT_CELL == "" ]]
 then
 	rm $HOME/.local/share/applications/cam.desktop
 else
