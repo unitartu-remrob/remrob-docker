@@ -168,7 +168,6 @@ ENV ROS_PYTHON_VERSION=3
 RUN mkdir -p $HOME/catkin_ws/src
 WORKDIR $HOME/catkin_ws/src
 COPY --chown=1000:1000 src .
-COPY realsense-ros/realsense2_description realsense2_description
 WORKDIR $HOME/catkin_ws
 RUN source /opt/ros/${ROS_DISTRO}/setup.bash && \
     catkin init && \
