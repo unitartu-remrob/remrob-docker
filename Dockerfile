@@ -115,9 +115,10 @@ COPY system/kazam.desktop /usr/share/applications/kazam.desktop
 RUN apt-get update -y \
     && apt-get install -y --no-install-recommends \
         python3-catkin-tools \
-        python3-rosdep \
+        # python3-rosdep \
         ros-${ROS_DISTRO}-joy \
         ros-${ROS_DISTRO}-teleop-twist-keyboard \
+        ros-${ROS_DISTRO}-realsense2-description \
         ros-${ROS_DISTRO}-serial \
         ros-${ROS_DISTRO}-depthimage-to-laserscan \
         ros-${ROS_DISTRO}-gmapping \
