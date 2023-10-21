@@ -174,6 +174,9 @@ RUN source /opt/ros/${ROS_DISTRO}/setup.bash && \
     catkin init && \
     catkin build
 
+# Save bash history
+RUN echo "HISTFILE=$HOME/catkin_ws/.bash_history" >> $HOME/.bashrc
+
 # GNOME customized config
 COPY system/user $HOME/.config/dconf/user
 COPY img/wallpaper.png $HOME/Pictures/Wallpapers/
