@@ -19,3 +19,13 @@
 [submodule "src/robotont_driver"]
 	path = src/robotont_driver
 	url = https://github.com/robotont/robotont_driver
+[submodule "src/gazebo_ros_pkgs"]
+	path = src/gazebo_ros_pkgs
+	url = https://github.com/ros-simulation/gazebo_ros_pkgs.git
+	branch = noetic-devel
+[submodule "src/gazebo"]
+	path = src/gazebo
+	url = https://github.com/Tsapu/gazebo-metrics.git
+[submodule "src/rviz"]
+	path = src/rviz
+	url = https://github.com/Tsapu/rviz-metrics.git
