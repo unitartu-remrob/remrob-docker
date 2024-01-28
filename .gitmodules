@@ -26,7 +26,7 @@
 [submodule "src/gazebo"]
 	path = src/gazebo
 	url = https://github.com/Tsapu/gazebo-metrics.git
-	branch = noetic-devel
+	branch = gazebo11
 [submodule "src/rviz"]
 	path = src/rviz
 	url = https://github.com/Tsapu/rviz-metrics.git
