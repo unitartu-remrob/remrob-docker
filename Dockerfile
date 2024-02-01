@@ -124,7 +124,9 @@ RUN apt-get update -y \
         ros-${ROS_DISTRO}-gmapping \
         ros-${ROS_DISTRO}-move-base \
         ros-${ROS_DISTRO}-amcl \
-        ros-${ROS_DISTRO}-map-server
+        ros-${ROS_DISTRO}-map-server \
+        && apt-get clean \
+        && rm -rf /var/lib/apt/lists/*
 
 
 RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
@@ -138,6 +140,70 @@ RUN echo "Hidden=true" >> /etc/xdg/autostart/update-notifier.desktop
 # Set timezone:
 RUN rm -rf /etc/localtime
 RUN ln -s /usr/share/zoneinfo/Europe/Tallinn /etc/localtime
+
+# Install dependencies for building Gazebo from source (https://classic.gazebosim.org/tutorials?tut=install_from_source&cat=install)
+RUN sudo apt-get -y remove '.*gazebo.*' '.*sdformat.*' '.*ignition-math.*' '.*ignition-msgs.*' '.*ignition-transport.*'
+RUN sudo sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'
+RUN wget https://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
+#COPY scripts/gazebo_dependencies.sh /tmp/dependencies.sh
+RUN apt-get update -y \
+    && apt-get install -y --no-install-recommends \
+    build-essential \
+    cmake \
+    debhelper \
+    mesa-utils \
+    x11-utils \
+    cppcheck \
+    xsltproc \
+    python3-lxml \
+    python3-psutil \
+    python3 \
+    bc \
+    netcat-openbsd \
+    gnupg2 \
+    net-tools \
+    locales \
+    sudo \
+    libfreeimage-dev \
+    libprotoc-dev \
+    libprotobuf-dev \
+    protobuf-compiler \
+    freeglut3-dev \
+    libcurl4-openssl-dev \
+    libtinyxml-dev \
+    libtinyxml2-dev \
+    libtar-dev \
+    libtbb-dev \
+    libogre-1.9-dev libogre-2.1-dev \
+    libxml2-dev \
+    pkg-config \
+    qtbase5-dev \
+    libqwt-qt5-dev \
+    libltdl-dev \
+    libgts-dev \
+    libboost-thread-dev \
+    libboost-system-dev \
+    libboost-filesystem-dev \
+    libboost-program-options-dev \
+    libboost-regex-dev \
+    libboost-iostreams-dev \
+    libbullet-dev \
+    libsimbody-dev \ 
+    libignition-common3-dev \
+    libignition-fuel-tools4-dev \
+    libignition-transport8-dev \
+    libignition-math6-dev \
+    libignition-msgs5-dev \
+    libsdformat9-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+
+RUN apt-get update -y \
+    && apt-get install -y --no-install-recommends \
+        xdo \
+        && apt-get clean \
+        && rm -rf /var/lib/apt/lists/*
 
 # Create unprivileged user
 # NOTE user hardcoded in tigervnc.service
@@ -155,7 +221,6 @@ ENV USER="${USER}" \
 USER "${USER}"
 WORKDIR "/home/${USER}"
 
-
 # Set up VNC
 RUN mkdir -p $HOME/.vnc
 COPY system/xstartup $HOME/.vnc/xstartup
@@ -168,11 +233,19 @@ ENV ROS_PYTHON_VERSION=3
 
 RUN mkdir -p $HOME/catkin_ws/src
 WORKDIR $HOME/catkin_ws/src
+
+# ARG CACHEBUST=1 
+# RUN echo "$CACHEBUST"
 COPY --chown=1000:1000 src .
 WORKDIR $HOME/catkin_ws
 RUN source /opt/ros/${ROS_DISTRO}/setup.bash && \
     catkin init && \
     catkin build
+
+# Create metric collection files
+# RUN mkdir -p $HOME/.ros
+# RUN touch $HOME/.ros/FPS_out.txt
+# RUN touch $HOME/.ros/GAZEBO_FPS_out.txt
 
 # Save bash history
 RUN echo "HISTFILE=$HOME/catkin_ws/.bash_history" >> $HOME/.bashrc
@@ -206,6 +279,7 @@ RUN echo "source /.env.sh" >> $HOME/.bashrc
 RUN echo "source /opt/ros/noetic/setup.bash" >> $HOME/.bashrc
 RUN echo "source ${HOME}/catkin_ws/devel/setup.bash" >> $HOME/.bashrc
 RUN echo "export ROS_MASTER_URI=http://localhost:11311" >> $HOME/.bashrc
+RUN mkdir $HOME/.ros
 
 # switch back to root to start systemd
 USER root
@@ -217,18 +291,17 @@ EXPOSE 5902
 COPY scripts/chrome_pip_extension.sh $HOME/.ext.sh
 RUN bash $HOME/.ext.sh
 
-COPY services/cam_launch.service /etc/systemd/system/cam_launch.service
-RUN systemctl enable cam_launch.service
+# COPY services/cam_launch.service /etc/systemd/system/cam_launch.service
+# RUN systemctl enable cam_launch.service
 
 RUN systemctl mask user@1000.service
 
 ARG SCRIPTS=$HOME/.scripts
 RUN mkdir $SCRIPTS
-COPY scripts/welcome_msg.sh $SCRIPTS/welcome_msg.sh
-COPY scripts/print_message.sh $SCRIPTS/print_message.sh
+COPY scripts/performance_test.sh $SCRIPTS/performance_test.sh
 
-COPY services/terminal_launch.service /etc/systemd/system/terminal_launch.service
-RUN systemctl enable terminal_launch.service
+COPY services/performance_test.service /etc/systemd/system/performance_test.service
+RUN systemctl enable performance_test.service
 
 # RUN mkdir -p /root/.vnc & mkdir -p /root/.config/autostart
 # COPY startup.desktop /root/.config/autostart/startup.desktop

@@ -20,15 +20,8 @@ sed -i '/ROS_MASTER_URI/c\export ROS_MASTER_URI=http://${ROS_MASTER}:11311' $HOM
 echo "${USER} ALL=(ALL) NOPASSWD: ALL, !/bin/su, !/bin/bash, !/bin/sh" > "/etc/sudoers.d/${USER}"
 
 
-# check if ROBOT_CELL is set (for simulation the camrea shortcut should be removed)
-# if [[ -v $ROBOT_CELL ]]
-if [[ $ROBOT_CELL == "" ]]
-then
-	rm $HOME/.local/share/applications/cam.desktop
-else
-	chmod +x $HOME/.launch_camera.sh
-	chmod +x $HOME/.launch_pip.sh
-fi
+chmod +x $HOME/.launch_camera.sh
+chmod +x $HOME/.launch_pip.sh
 
 sed -n '
 1i[Default Applications]

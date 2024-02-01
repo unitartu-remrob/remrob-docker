@@ -22,3 +22,5 @@ sleep 0.4
 
 pip=$(xdotool search --name "Picture in picture" | tail -1);
 xdotool windowsize $pip 500 400 windowmove $pip 1300 600
+
+roslaunch robotont_gazebo world_minimaze.launch
