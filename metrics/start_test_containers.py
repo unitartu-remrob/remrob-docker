@@ -14,6 +14,7 @@ load_dotenv('.env')
 
 host = os.getenv('HOST')
 jwt_token = os.getenv('JWT_TOKEN')
+auth_header = {'Authorization': f'Bearer {jwt_token}'}
 
 if (len(sys.argv) > 1):
 	NUM_CONTAINERS = int(sys.argv[1])
@@ -25,17 +26,15 @@ BROWSER = 'google-chrome'
 BROWSER_PROCESS_NAME = 'chrome'
 
 urls = []
-start_from = 3
+start_from = 4
 
 def start_containers(num_containers=1):
-    headers = {'Authorization': f'Bearer {jwt_token}'}
-
+    
     for i in range(num_containers):
         container_name = f"robosim-{start_from+i}"  # Adjust the naming scheme as needed
         url = f"http://{host}/containers/start/{container_name}?is_simulation=true"
-        response = requests.post(url, headers=headers)
+        response = requests.post(url, headers=auth_header)
         if (response.status_code == 200):
-            print(response.json())
             url = f"http://{host}{response.json()['path']}"
             urls.append(url)
             print(f"Container url:", url)
@@ -50,29 +49,27 @@ def close_novnc():
     os.system(f"killall -9 '{BROWSER_PROCESS_NAME}'")
 
 def stop_containers(num_containers=1):
-    headers = {'Authorization': f'Bearer {jwt_token}'}
 
     for i in range(num_containers):
         container_name = f"robosim-{start_from+i}"  # Adjust the naming scheme as needed
         url = f"http://{host}/containers/stop/{container_name}"
-        response = requests.post(url, headers=headers)
+        response = requests.post(url, headers=auth_header)
         print(f"Status for {container_name}: {response.status_code}")
 
 def remove_containers(num_containers=1):
-    headers = {'Authorization': f'Bearer {jwt_token}'}
 
     for i in range(num_containers):
         container_name = f"robosim-{start_from+i}"  # Adjust the naming scheme as needed
         url = f"http://{host}/containers/remove/{container_name}"
-        response = requests.post(url, headers=headers)
+        response = requests.post(url, headers=auth_header)
         print(f"Status for {container_name}: {response.status_code}")
 
 
 
-def exec_command_in_containers(num_containers=1, command="echo 'Hello, World!'"):
-    for i in range(num_containers):
-        container_name = f"robosim-{start_from+1}"  # Adjust the naming scheme as needed
-        subprocess.run(["docker", "exec", container_name, "bash", "-c", command])
+# def exec_command_in_containers(num_containers=1, command="echo 'Hello, World!'"):
+#     for i in range(num_containers):
+#         container_name = f"robosim-{start_from+1}"  # Adjust the naming scheme as needed
+#         subprocess.run(["docker", "exec", container_name, "bash", "-c", command])
 
 if __name__ == '__main__':
     start_containers(NUM_CONTAINERS)

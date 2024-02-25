@@ -17,18 +17,19 @@ run_in_new_terminal() {
 
 run_in_new_terminal "roslaunch robotont_gazebo world_minimaze.launch"
 sleep 0.2;
+
 run_in_new_terminal "rosrun teleop_twist_keyboard teleop_twist_keyboard.py"
-# xdotool windowclose $window_id;
-# xdotool key q; xdotool key q; xdotool key q;
-# xdotool key j;
-# sleep 0.1;
-# xdotool key i;
-# sleep 0.1;
-# xdotool key o;
+sleep 6;
+xdotool keydown q;
+sleep 0.7;
 
+teleop_terminal=$(xdotool search --name "Terminal" | tail -1);
+xdotool windowsize $teleop_terminal 150 100 windowmove $teleop_terminal 10 10
 
-sleep 12;
+xdotool keydown j;
+sleep 15;
 
+xdotool keyup j;
 xdo close -a Gazebo
 
 
