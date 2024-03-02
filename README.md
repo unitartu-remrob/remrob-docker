@@ -15,18 +15,8 @@ docker build -t robotont:performance-tests . # Image name is arbitrary, but reme
 To run the tests:
 
 1) Disable workspace mapping in remrob-server when using a freshly-built image that has new packages (e.g., source-built Rviz & Gazebo), otherwise the saved workspace overrides them.
-2) In `remrob-server` simulation compose template (`server/compose/templates/local.j2`) make sure the image name is correct (e.g. `robotont:performance-tests`), and that the following volume mounts are present:
-3) increase container memory limits, otherwise will fail
-
-```yaml
-
-```
+2) In `remrob-server` simulation compose template (`server/compose/templates/local.j2`) make sure the image name is correct (e.g. `robotont:performance-tests`), and that the FPS volume file mounts are present. E.g. map to a)`$HOME/.ros/FPS_out.txt` for RViz and b)`$HOME/.ros/GAZEBO_FPS_out.txt` for Gazebo image.
 
 !NB
 
 - Remember to disable workspace mapping in remrob-server when using a freshly-built image that has new packages, otherwise the saved workspace overrides them. Another option is to move the old workspace out of the directory it's being mapped to. When performance measurements are done, the workspace can be moved back in.
-
-
-```bash
-pip install -r requirements.txt
-```
