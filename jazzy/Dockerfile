@@ -160,9 +160,10 @@ ENV USER="${USER}" \
     HOME="/home/${USER}"
 WORKDIR "${HOME}"
 
-RUN mkdir -p /tmp/xdg-runtime-${UID} && \
-    chown -R $USER:$USER /tmp/xdg-runtime-${UID}
 ENV XDG_RUNTIME_DIR=/tmp/xdg-runtime-${UID}
+RUN mkdir -p $XDG_RUNTIME_DIR && \
+    chown -R $USER:$USER $XDG_RUNTIME_DIR && \
+    chmod 700 $XDG_RUNTIME_DIR
 
 RUN systemctl mask user@${UID}.service
 

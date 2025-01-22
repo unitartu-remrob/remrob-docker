@@ -79,6 +79,8 @@ docker compose -f jazzy/docker-compose.cudagl.yaml up
 
 The Nvidia GPU graphics are being tunneled through host's DISPLAY :0, but it can be switched to a different one (e.g. `-v /tmp/.X11-unix/X0:/tmp/.X11-unix/X1` --> `v /tmp/.X11-unix/X1:/tmp/.X11-unix/X1`).
 
+Until sysbox has released [GPU pass-through support](https://github.com/nestybox/sysbox/issues/50) the cgroup mounting solution remains.
+
 ## Customizing the gnome GUI
 
 Replace the user binary file (e.g. `jazzy/config/user-base`) with your custom binary (found at `~/.config/dconf/user`) and rebuild.

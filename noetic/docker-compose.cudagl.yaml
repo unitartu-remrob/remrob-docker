@@ -1,6 +1,6 @@
 services:
   remrob-noetic-cudagl:
-    image: robotont:noetic-cudagl
+    image: remrob:noetic-cudagl
     container_name: robo-1
     hostname: robo-1
     environment:
@@ -13,7 +13,7 @@ services:
     cap_add:
       - SYS_ADMIN
     volumes: 
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - /sys/fs/cgroup:/sys/fs/cgroup
       - /tmp/.X11-unix/X0:/tmp/.X11-unix/X1:ro
     ports:
       - '5902:5902'
@@ -23,4 +23,4 @@ services:
           devices:
             - driver: nvidia
               count: 'all'
-              capabilities: [gpu, utility, graphics]
+              capabilities: [gpu]

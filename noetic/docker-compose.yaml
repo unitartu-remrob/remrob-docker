@@ -1,6 +1,6 @@
 services:
   remrob-noetic:
-    image: robotont:noetic-base
+    image: remrob:noetic-base
     container_name: robo-1
     hostname: robo-1
     environment:
@@ -12,6 +12,6 @@ services:
     cap_add:
       - SYS_ADMIN
     volumes: 
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - /sys/fs/cgroup:/sys/fs/cgroup
     ports:
       - '5902:5902'
