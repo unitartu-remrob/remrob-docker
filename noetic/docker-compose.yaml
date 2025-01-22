@@ -1,0 +1,17 @@
+services:
+  remrob-noetic:
+    image: robotont:noetic-base
+    container_name: robo-1
+    hostname: robo-1
+    environment:
+      - PASSWORD=remrob
+    tmpfs:
+      - /run
+      - /run/lock
+      - /tmp
+    cap_add:
+      - SYS_ADMIN
+    volumes: 
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    ports:
+      - '5902:5902'

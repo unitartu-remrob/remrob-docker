@@ -1,13 +1,13 @@
 
 
-# A vnc-ros2-gnome image with HA enabled
+# A vnc-ros-gnome image with hardware acceleration support
 
 ## Main components
 
 - GNOME Desktop
-- ROS2 Jazzy Jalisco
 - TigerVNC server
 - VirtualGL
+- ROS
 
 Inspired by:
 - https://github.com/darkdragon-001/Dockerfile-Ubuntu-Gnome
@@ -16,37 +16,88 @@ Inspired by:
 - https://github.com/Open-UAV/openuav-turbovnc
 
 ---
-## Requirements
+# Requirements
+- Docker (>=27.5.0)
+- Ubuntu (>=20.04)
 
-- Podman
-
-&nbsp;
+## Optional requirements
+For hardware accelerated rendering of OpenGL apps like Gazebo:
+- Nvidia GPU with a graphics driver [compatible with CUDA version 12.6.3](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/index.html#id5)
+- [nvidia-ctk](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
 
 # Setup
 
-### Building the image
+## Building the image
 
-`podman build -t remrob:ros2 --format docker --file Dockerfile.ros2 .`
+```bash
+# two options available (noetic || jazzy)
+bash ./build.sh --target jazzy
 
-### Running the container
-
+# or build version with cudagl support
+bash ./build.sh --target jazzy --nvidia 1
 ```
-podman run --rm
-  --cgroupns=host \
-  --tmpfs /run  --tmpfs /run/lock --tmpfs /tmp \
-  --cap-add SYS_BOOT --cap-add SYS_ADMIN \
-  -v /sys/fs/cgroup:/sys/fs/cgroup \
-  --systemd=true \
-  --name=robo-1 \
-  -p 5902:5902 \
-  --device nvidia.com/gpu=all \
-  -v /tmp/.X11-unix/X1:/tmp/.X11-unix/X1 \
-  -e PASSWORD=remrob \
-  remrob:ros2
-  ```
 
-The VNC server is running on port 5902, connect to it with any VNC client you have (pw: remrob). The Nvidia GPU graphics are being tunneled through host's DISPLAY :1.
+## Running the container
 
+### Base image:
+```bash
+docker run --rm \
+    --tmpfs /run  --tmpfs /run/lock --tmpfs /tmp \
+    --cap-add SYS_BOOT --cap-add SYS_ADMIN  \
+    --security-opt apparmor=unconfined \
+    -v /sys/fs/cgroup:/sys/fs/cgroup \
+    --name=robo-1 \
+    -p 5902:5902 \
+    -e PASSWORD=remrob \
+    remrob:jazzy-base
+
+# or run with compose
+docker compose -f jazzy/docker-compose.yaml up
+```
+
+The VNC server is running on port 5902, connect to it with any VNC client you have (default password: remrob).
+
+### With nvidia-ctk:
+```bash
+docker run --rm \
+    --tmpfs /run  --tmpfs /run/lock --tmpfs /tmp \
+    --cap-add SYS_BOOT --cap-add SYS_ADMIN  \
+    --security-opt apparmor=unconfined \
+    -v /sys/fs/cgroup:/sys/fs/cgroup \
+    -v /tmp/.X11-unix/X0:/tmp/.X11-unix/X1 \
+    --name=robo-1 \
+    -p 5902:5902 \
+    -e PASSWORD=remrob \
+    -e VGL_DISPLAY=:1 \
+    --runtime=nvidia \
+    --gpus all \
+    remrob:jazzy-cudagl
+
+# or the same with compose
+docker compose -f jazzy/docker-compose.cudagl.yaml up
+```
+
+The Nvidia GPU graphics are being tunneled through host's DISPLAY :0, but it can be switched to a different one (e.g. `-v /tmp/.X11-unix/X0:/tmp/.X11-unix/X1` --> `v /tmp/.X11-unix/X1:/tmp/.X11-unix/X1`).
+
+## Customizing the gnome GUI
+
+Replace the user binary file (e.g. `jazzy/config/user-base`) with your custom binary (found at `~/.config/dconf/user`) and rebuild.
+
+**!NB!** For CudaGL images preserve or don't forget to add `vglrun /bin/bash` as the custom command in your profile, so the OpenGL apps like Gazebo are piped through VirtualGL.
+
+![GNOME ROS VNC](./assets/desktop.png)
+
+## Running the image under Ubuntu 24.04
+
+**Base image:**
+1) Must disable unified cgroup hierarchy in the Grub loader (systemd.unified_cgroup_hierarchy=0)
+
+**CudaGL image additional steps:** 
+1) Switch from default Wayland to Xorg display server
+2) Enable host display access
+```
+xhost +local:docker
+```
 
 &nbsp;&nbsp;
 

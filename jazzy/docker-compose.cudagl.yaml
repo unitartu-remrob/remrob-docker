@@ -1,0 +1,31 @@
+services:
+  remrob-jazzy-cudagl:
+    image: remrob:jazzy-cudagl
+    container_name: robo-1
+    hostname: robo-1
+    environment:
+      - PASSWORD=remrob
+      - VGL_DISPLAY=:1
+    tmpfs:
+      - /run
+      - /run/lock
+      - /tmp
+    volumes: 
+      - /sys/fs/cgroup:/sys/fs/cgroup
+      - /tmp/.X11-unix/X0:/tmp/.X11-unix/X1:ro
+    cap_add:
+      - SYS_ADMIN
+      - SYS_BOOT
+    security_opt:
+      - 'apparmor=unconfined'
+    ports:
+      - '5902:5902'
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 'all'
+              capabilities: [gpu, utility, graphics]
+
+    

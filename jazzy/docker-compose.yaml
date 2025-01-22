@@ -1,0 +1,21 @@
+services:
+  remrob-jazzy:
+    image: remrob:jazzy-base
+    container_name: robo-1
+    hostname: robo-1
+    environment:
+      - PASSWORD=remrob
+    tmpfs:
+      - /run
+      - /run/lock
+      - /tmp
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup
+    cap_add:
+      - SYS_ADMIN
+      - SYS_BOOT
+    security_opt:
+      - 'apparmor=unconfined'
+    ports:
+      - '5902:5902'
+    
