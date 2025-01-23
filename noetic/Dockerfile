@@ -120,7 +120,9 @@ SHELL ["/bin/bash", "-c"]
 ARG UID=1000
 ARG USER=kasutaja
 ARG PASSWD=remrob
-RUN useradd ${USER} -u ${UID} -U -d /home/${USER} -m -s /bin/bash
+RUN useradd ${USER} -u ${UID} -U -d /home/${USER} -m -s /bin/bash && \
+    groupadd vglusers && \
+    usermod -aG vglusers ${USER}
 
 RUN echo "${USER}:${PASSWD}" | chpasswd
 ENV USER="${USER}" \
