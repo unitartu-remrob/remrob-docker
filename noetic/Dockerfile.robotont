@@ -1,0 +1,88 @@
+# FROM ${BASE_IMAGE}
+
+FROM remrob:noetic-cudagl
+
+ARG USER=kasutaja
+ARG HOME=/home/${USER}
+
+SHELL ["/bin/bash", "-c"]
+
+# Set timezone:
+RUN rm -rf /etc/localtime
+RUN ln -s /usr/share/zoneinfo/Europe/Tallinn /etc/localtime
+
+# screen recording
+RUN apt-get update -y \
+    && apt-get install -y --no-install-recommends \
+        kazam \
+        vlc \
+        xdotool \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+COPY common/system/kazam.desktop /usr/share/applications/kazam.desktop
+COPY common/system/kazam.conf $HOME/.config/kazam/kazam.conf
+
+# install chrome for webrtc
+RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
+    && dpkg -i google-chrome-stable_current_amd64.deb \
+    && rm google-chrome-stable_current_amd64.deb
+
+# ROS dependencies for Robotont packages
+RUN apt-get update -y \
+    && apt-get install -y --no-install-recommends \
+        python3-catkin-tools \
+        ros-noetic-joy \
+        ros-noetic-teleop-twist-keyboard \
+        ros-noetic-realsense2-description \
+        ros-noetic-serial \
+        ros-noetic-depthimage-to-laserscan \
+        ros-noetic-gmapping \
+        ros-noetic-move-base \
+        ros-noetic-amcl \
+        ros-noetic-map-server
+
+# create and build catkin workspace as a regular user
+USER ${USER}
+ARG ROBOTONT_REPO_SOURCE=https://github.com/robotont
+
+RUN mkdir -p $HOME/catkin_ws/src
+WORKDIR $HOME/catkin_ws/src
+RUN git clone -b noetic-devel ${ROBOTONT_REPO_SOURCE}/robotont_demos && \
+    git clone -b noetic-devel ${ROBOTONT_REPO_SOURCE}/robotont_description && \
+    git clone -b noetic-devel ${ROBOTONT_REPO_SOURCE}/robotont_nuc_description && \
+    git clone -b noetic-devel ${ROBOTONT_REPO_SOURCE}/robotont_driver && \
+    git clone -b noetic-devel ${ROBOTONT_REPO_SOURCE}/robotont_msgs && \
+    git clone -b noetic-devel ${ROBOTONT_REPO_SOURCE}/robotont_navigation && \
+    git clone -b noetic-devel ${ROBOTONT_REPO_SOURCE}/robotont_gazebo
+
+WORKDIR $HOME/catkin_ws
+RUN source /opt/ros/noetic/setup.bash && \
+    catkin init && \
+    catkin build
+
+ARG SCRIPTS=$HOME/.scripts
+RUN mkdir $SCRIPTS
+
+# ========================
+# Camera shortcut
+# ========================
+COPY assets/camera.png $HOME/Pictures/camera.png
+COPY common/system/cam.desktop $HOME/.local/share/applications/cam.desktop
+COPY common/scripts/launch_camera.sh $SCRIPTS/launch_camera.sh
+
+# Welcome message
+COPY common/scripts/welcome_msg.sh $SCRIPTS/welcome_msg.sh
+COPY common/scripts/print_message.sh $SCRIPTS/print_message.sh
+COPY common/services/terminal_launch.service /etc/systemd/system/terminal_launch.service
+
+USER root
+RUN systemctl enable terminal_launch.service
+RUN chown $USER:$USER $SCRIPTS/launch_camera.sh && \
+    chmod +x $SCRIPTS/launch_camera.sh
+
+# set entrypoint
+COPY noetic/docker-entrypoint.sh /.docker-entrypoint.sh
+COPY noetic/robotont-entrypoint.sh /.robotont-entrypoint.sh
+
+CMD [ "/sbin/init" ]
+ENTRYPOINT ["/.robotont-entrypoint.sh"]

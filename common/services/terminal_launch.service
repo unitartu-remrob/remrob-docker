@@ -1,0 +1,15 @@
+[Unit]
+Description=Starts a terminal for the users on container launch
+After=syslog.target network.target
+
+[Service]
+Type=forking
+User=kasutaja
+WorkingDirectory=/home/kasutaja
+
+ExecStartPre=/bin/sleep 2
+ExecStart=/bin/bash .scripts/welcome_msg.sh
+
+[Install]
+WantedBy=default.target
+
