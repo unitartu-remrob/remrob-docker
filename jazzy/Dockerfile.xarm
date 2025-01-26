@@ -1,0 +1,50 @@
+ARG BASE_IMAGE=remrob:jazzy-cudagl
+FROM ${BASE_IMAGE}
+
+ARG USER=kasutaja
+ARG HOME=/home/${USER}
+
+SHELL ["/bin/bash", "-c"]
+
+# Set timezone:
+RUN rm -rf /etc/localtime
+RUN ln -s /usr/share/zoneinfo/Europe/Tallinn /etc/localtime
+
+RUN apt-get update -y 
+# create ros2 workspace as a regular user
+USER ${USER}
+
+RUN mkdir -p $HOME/ros2_ws/src
+WORKDIR $HOME/ros2_ws/src
+RUN git clone -b jazzy https://github.com/xArm-Developer/xarm_ros2 \
+    && cd xarm_ros2 \
+    && git pull \
+    && git submodule sync \
+    && git submodule update --init --remote
+
+RUN rosdep update \
+    && rosdep install -i --from-path . --rosdistro jazzy --ignore-src -y
+
+WORKDIR $HOME/ros2_ws
+RUN source /opt/ros/jazzy/setup.bash && \
+    sed -i '/uf_robot_system_hardware/s/^/#/' src/xarm_ros2/xarm_controller/CMakeLists.txt && \
+    colcon build --symlink-install
+RUN echo "source $HOME/ros2_ws/install/local_setup.bash" >> $HOME/.bashrc
+
+
+ARG SCRIPTS=$HOME/.scripts
+RUN mkdir $SCRIPTS
+
+# Welcome message
+COPY common/scripts/welcome_msg.sh $SCRIPTS/welcome_msg.sh
+COPY common/scripts/print_message.sh $SCRIPTS/print_message.sh
+COPY common/services/terminal_launch.service /etc/systemd/system/terminal_launch.service
+
+USER root
+RUN systemctl enable terminal_launch.service
+
+# set entrypoint
+COPY jazzy/docker-entrypoint.sh /.docker-entrypoint.sh
+
+CMD [ "/sbin/init" ]
+ENTRYPOINT ["/.docker-entrypoint.sh"]

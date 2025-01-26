@@ -1,6 +1,5 @@
-# FROM ${BASE_IMAGE}
-
-FROM remrob:noetic-cudagl
+ARG BASE_IMAGE=remrob:noetic-cudagl
+FROM ${BASE_IMAGE}
 
 ARG USER=kasutaja
 ARG HOME=/home/${USER}

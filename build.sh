@@ -58,12 +58,14 @@ if [[ $TARGET == "jazzy" ]]; then
     else
         BASE_IMAGE=$BASE_IMAGE_JAZZY
     fi
+    ROBOT="xarm"
 elif [ $TARGET == "noetic" ]; then
     if [[ $CUDAGL_ENABLED == 1 ]]; then
         BASE_IMAGE=$BASE_IMAGE_NOETIC_CUDAGL
     else
         BASE_IMAGE=$BASE_IMAGE_NOETIC
     fi
+    ROBOT="robotont"
 fi
 
 
@@ -74,10 +76,19 @@ fi
 
 TAG="$TARGET-$IMAGE_SUFFIX"
 
-echo "Building "$IMAGE_NAME-$TAG" image..."
+echo "Building "$IMAGE_NAME:$TAG" image..."
 docker build \
     -f "$TARGET/Dockerfile" \
     -t "$IMAGE_NAME:$TAG" \
     --build-arg BASE_IMAGE=$BASE_IMAGE \
     --build-arg IMAGE_TYPE=$IMAGE_TYPE \
     "$BUILD_CONTEXT"
+
+if [[ ! -z "${ROBOT:-}" ]]; then
+    echo "Building child image "$ROBOT:$TAG" from $BASE_IMAGE..."
+    docker build \
+        -f "$TARGET/Dockerfile.$ROBOT" \
+        -t "$ROBOT:$TAG" \
+        --build-arg BASE_IMAGE=$IMAGE_NAME:$TAG \
+        "$BUILD_CONTEXT"
+fi
