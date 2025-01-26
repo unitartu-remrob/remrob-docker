@@ -1,5 +1,5 @@
 #!/bin/bash
-VALID_TARGETS=("noetic" "jazzy")
+VALID_TARGETS=("noetic" "humble" "jazzy")
 
 IMAGE_NAME="remrob"
 BUILD_CONTEXT="."
@@ -9,6 +9,9 @@ IMAGE_SUFFIX="base"
 
 BASE_IMAGE_NOETIC="ubuntu:focal"
 BASE_IMAGE_NOETIC_CUDAGL="nvidia/cudagl:11.4.2-base-ubuntu20.04"
+
+BASE_IMAGE_HUMBLE="ubuntu:jammy"
+BASE_IMAGE_HUMBLE_CUDAGL="tsapu/cudagl:12.6.3-runtime-ubuntu22.04"
 
 BASE_IMAGE_JAZZY="ubuntu:noble"
 BASE_IMAGE_JAZZY_CUDAGL="tsapu/cudagl:12.6.3-runtime-ubuntu24.04"
@@ -59,6 +62,13 @@ if [[ $TARGET == "jazzy" ]]; then
         BASE_IMAGE=$BASE_IMAGE_JAZZY
     fi
     ROBOT="xarm"
+elif [ $TARGET == "humble" ]; then
+    if [[ $CUDAGL_ENABLED == 1 ]]; then
+        BASE_IMAGE=$BASE_IMAGE_HUMBLE_CUDAGL
+    else
+        BASE_IMAGE=$BASE_IMAGE_HUMBLE
+    fi
+
 elif [ $TARGET == "noetic" ]; then
     if [[ $CUDAGL_ENABLED == 1 ]]; then
         BASE_IMAGE=$BASE_IMAGE_NOETIC_CUDAGL
