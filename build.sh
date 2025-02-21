@@ -14,10 +14,15 @@ BASE_IMAGE_JAZZY_CUDAGL="tsapu/cudagl:12.6.3-runtime-ubuntu24.04"
 
 CUDAGL_ENABLED=false
 
+BUILD_ROBOT_IMAGE=true
+ROBOTONT="robotont"
+XARM="xarm"
+
 usage() {
     echo "Usage: $0 [--target <target>] [--nvidia] [--help]"
     echo "  --target        Specify the ROS version (e.g., noetic or jazzy)"
     echo "  --nvidia        Build NVIDIA runtime supported image"
+    echo "  --no-robot      Skip building the robot child image"
     exit 1
 }
 
@@ -26,6 +31,9 @@ while [[ "$#" -gt 0 ]]; do
         --target) TARGET="$2"; shift ;;
         --nvidia)
             CUDAGL_ENABLED=true
+            ;;
+        --no-robot)
+            BUILD_ROBOT_IMAGE=false
             ;;
         --help)
             usage ;;
@@ -52,14 +60,14 @@ if [[ $TARGET == "jazzy" ]]; then
     else
         BASE_IMAGE=$BASE_IMAGE_JAZZY
     fi
-    ROBOT="xarm"
+    ROBOT=$XARM
 elif [ $TARGET == "noetic" ]; then
     if $CUDAGL_ENABLED; then
         BASE_IMAGE=$BASE_IMAGE_NOETIC_CUDAGL
     else
         BASE_IMAGE=$BASE_IMAGE_NOETIC
     fi
-    ROBOT="robotont"
+    ROBOT=$ROBOTONT
 fi
 
 
@@ -78,8 +86,8 @@ docker build \
     --build-arg IMAGE_TYPE=$IMAGE_TYPE \
     "$BUILD_CONTEXT"
 
-if [[ ! -z "${ROBOT:-}" ]]; then
-    echo "Building child image "$ROBOT:$TAG" from $BASE_IMAGE..."
+if $BUILD_ROBOT_IMAGE; then
+    echo "Building child image "$ROBOT:$TAG" from $IMAGE_NAME:$TAG..."
     docker build \
         -f "$TARGET/Dockerfile.$ROBOT" \
         -t "$ROBOT:$TAG" \
