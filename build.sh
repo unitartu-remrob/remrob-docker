@@ -3,7 +3,6 @@ VALID_TARGETS=("noetic" "jazzy")
 
 IMAGE_NAME="remrob"
 BUILD_CONTEXT="."
-CUDAGL_ENABLED=0
 IMAGE_TYPE="base"
 IMAGE_SUFFIX="base"
 
@@ -13,11 +12,12 @@ BASE_IMAGE_NOETIC_CUDAGL="nvidia/cudagl:11.4.2-base-ubuntu20.04"
 BASE_IMAGE_JAZZY="ubuntu:noble"
 BASE_IMAGE_JAZZY_CUDAGL="tsapu/cudagl:12.6.3-runtime-ubuntu24.04"
 
+CUDAGL_ENABLED=false
+
 usage() {
-    echo "Usage: $0 [--target <target>] [--nvidia <0|1>] [--help]"
+    echo "Usage: $0 [--target <target>] [--nvidia] [--help]"
     echo "  --target        Specify the ROS version (e.g., noetic or jazzy)"
-    echo "  --nvidia        Specify whether to build NVIDIA runtime supported image (Default: 0)"
-    echo "                  Use 1 to enable, 0 to disable"
+    echo "  --nvidia        Build NVIDIA runtime supported image"
     exit 1
 }
 
@@ -25,12 +25,7 @@ while [[ "$#" -gt 0 ]]; do
     case $1 in
         --target) TARGET="$2"; shift ;;
         --nvidia)
-            if [[ "$2" =~ ^[01]$ ]]; then
-                CUDAGL_ENABLED="$2"
-            else
-                echo "Error: Invalid value for --nvidia (1 or 0 expected)."
-                usage
-            fi
+            CUDAGL_ENABLED=true
             shift
             ;;
         --help)
@@ -53,14 +48,14 @@ elif [[ ! " ${VALID_TARGETS[@]} " =~ " ${TARGET} " ]]; then
 fi
 
 if [[ $TARGET == "jazzy" ]]; then 
-    if [[ $CUDAGL_ENABLED == 1 ]]; then
+    if $CUDAGL_ENABLED; then
         BASE_IMAGE=$BASE_IMAGE_JAZZY_CUDAGL
     else
         BASE_IMAGE=$BASE_IMAGE_JAZZY
     fi
     ROBOT="xarm"
 elif [ $TARGET == "noetic" ]; then
-    if [[ $CUDAGL_ENABLED == 1 ]]; then
+    if $CUDAGL_ENABLED; then
         BASE_IMAGE=$BASE_IMAGE_NOETIC_CUDAGL
     else
         BASE_IMAGE=$BASE_IMAGE_NOETIC
@@ -69,7 +64,7 @@ elif [ $TARGET == "noetic" ]; then
 fi
 
 
-if [[ $CUDAGL_ENABLED == "1" ]]; then
+if $CUDAGL_ENABLED; then
     IMAGE_TYPE="vgl"
     IMAGE_SUFFIX="cudagl"
 fi
