@@ -167,6 +167,47 @@ RUN mkdir -p $XDG_RUNTIME_DIR && \
 
 RUN systemctl mask user@${UID}.service
 
+# **************************************
+# remrob.ut.ee dependencies  
+# **************************************
+RUN rm -rf /etc/localtime
+RUN ln -s /usr/share/zoneinfo/Europe/Tallinn /etc/localtime
+
+# screen recording
+RUN apt-get update -y \
+    && apt-get install -y --no-install-recommends \
+        kazam \
+        vlc \
+        xdotool \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+COPY common/system/kazam.desktop /usr/share/applications/kazam.desktop
+COPY common/system/kazam.conf $HOME/.config/kazam/kazam.conf
+
+# install chrome for webrtc
+RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
+    && dpkg -i google-chrome-stable_current_amd64.deb \
+    && rm google-chrome-stable_current_amd64.deb
+
+ARG SCRIPTS=$HOME/.scripts
+RUN mkdir $SCRIPTS
+
+# Camera shortcut
+COPY assets/camera.png $HOME/Pictures/camera.png
+COPY common/system/cam.desktop $HOME/.local/share/applications/cam.desktop
+COPY common/scripts/launch_camera.sh $SCRIPTS/launch_camera.sh
+
+# Welcome message
+COPY common/scripts/welcome_msg.sh $SCRIPTS/welcome_msg.sh
+COPY common/scripts/print_message.sh $SCRIPTS/print_message.sh
+COPY common/services/terminal_launch.service /etc/systemd/system/terminal_launch.service
+
+RUN systemctl enable terminal_launch.service
+RUN chown $USER:$USER $SCRIPTS/launch_camera.sh && \
+    chmod +x $SCRIPTS/launch_camera.sh
+
+# **************************************
+
 # GNOME customized config
 COPY jazzy/config/user-${IMAGE_TYPE} $HOME/.config/dconf/user
 COPY assets/forest_mist.jpg $HOME/Pictures/Wallpapers/

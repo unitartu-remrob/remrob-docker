@@ -6,10 +6,6 @@ ARG HOME=/home/${USER}
 
 SHELL ["/bin/bash", "-c"]
 
-# Set timezone:
-RUN rm -rf /etc/localtime
-RUN ln -s /usr/share/zoneinfo/Europe/Tallinn /etc/localtime
-
 RUN apt-get update -y 
 # create ros2 workspace as a regular user
 USER ${USER}
@@ -31,20 +27,5 @@ RUN source /opt/ros/jazzy/setup.bash && \
     colcon build --symlink-install
 RUN echo "source $HOME/ros2_ws/install/local_setup.bash" >> $HOME/.bashrc
 
-
-ARG SCRIPTS=$HOME/.scripts
-RUN mkdir $SCRIPTS
-
-# Welcome message
-COPY common/scripts/welcome_msg.sh $SCRIPTS/welcome_msg.sh
-COPY common/scripts/print_message.sh $SCRIPTS/print_message.sh
-COPY common/services/terminal_launch.service /etc/systemd/system/terminal_launch.service
-
+# must switch back to root for /sbin/init entrypoint
 USER root
-RUN systemctl enable terminal_launch.service
-
-# set entrypoint
-COPY jazzy/docker-entrypoint.sh /.docker-entrypoint.sh
-
-CMD [ "/sbin/init" ]
-ENTRYPOINT ["/.docker-entrypoint.sh"]
