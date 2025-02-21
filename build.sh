@@ -26,7 +26,6 @@ while [[ "$#" -gt 0 ]]; do
         --target) TARGET="$2"; shift ;;
         --nvidia)
             CUDAGL_ENABLED=true
-            shift
             ;;
         --help)
             usage ;;
