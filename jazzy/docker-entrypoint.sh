@@ -17,4 +17,26 @@ fi
 # source ROS overlay
 echo "source /opt/ros/jazzy/setup.bash" >> $HOME/.bashrc
 
+# **************************************
+# remrob.ut.ee settings
+# **************************************
+echo "GIT_PAT=${GIT_PAT}" >> $HOME/.env
+echo "ROBOT_CELL=${ROBOT_CELL}" >> $HOME/.env
+echo "ROS_DOMAIN_ID=${ROS_DOMAIN_ID}" >> $HOME/.env
+
+# check if ROBOT_CELL is set (for simulation the camrea shortcut should be removed)
+if [[ $ROBOT_CELL == "" ]]; then
+	rm $HOME/.local/share/applications/cam.desktop
+fi
+
+# set VLC as default video player
+sed -n '
+1i[Default Applications]
+/^video/{
+s/Totem/vlc/
+s/org\.gnome\.//p
+}' /usr/share/applications/defaults.list > $HOME/.local/share/applications/defaults.list
+
+# **************************************
+
 exec "$@"

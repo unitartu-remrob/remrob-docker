@@ -1,5 +1,9 @@
 #!/bin/bash
-VALID_TARGETS=("noetic" "jazzy")
+
+NOETIC="noetic"
+JAZZY="jazzy"
+
+VALID_TARGETS=($NOETIC $JAZZY)
 
 IMAGE_NAME="remrob"
 BUILD_CONTEXT="."
@@ -13,16 +17,26 @@ BASE_IMAGE_JAZZY="ubuntu:noble"
 BASE_IMAGE_JAZZY_CUDAGL="tsapu/cudagl:12.6.3-runtime-ubuntu24.04"
 
 CUDAGL_ENABLED=false
+BUILD_ROBOT_IMAGES=true
 
-BUILD_ROBOT_IMAGE=true
 ROBOTONT="robotont"
 XARM="xarm"
 
+ROBOT_OPTIONS_NOETIC=(
+    $ROBOTONT
+)
+
+ROBOT_OPTIONS_JAZZY=(
+    $ROBOTONT
+    $XARM
+)
+
 usage() {
-    echo "Usage: $0 [--target <target>] [--nvidia] [--help]"
+    echo "Usage: $0 --target <target> [--nvidia] [--robot <robot>] [--help]"
     echo "  --target        Specify the ROS version (e.g., noetic or jazzy)"
     echo "  --nvidia        Build NVIDIA runtime supported image"
-    echo "  --no-robot      Skip building the robot child image"
+    echo "  --robot         Specify robot child image to build (by default builds all)"
+    echo "  --no-robot      Do not build any robot child images"
     exit 1
 }
 
@@ -32,8 +46,10 @@ while [[ "$#" -gt 0 ]]; do
         --nvidia)
             CUDAGL_ENABLED=true
             ;;
+        --robot)
+            ROBOT="$2"; shift ;;
         --no-robot)
-            BUILD_ROBOT_IMAGE=false
+            BUILD_ROBOT_IMAGES=false
             ;;
         --help)
             usage ;;
@@ -44,7 +60,6 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
-
 if [[ -z "$TARGET" ]]; then
     echo "Error: --target is required"
     usage
@@ -54,22 +69,27 @@ elif [[ ! " ${VALID_TARGETS[@]} " =~ " ${TARGET} " ]]; then
     exit 1
 fi
 
-if [[ $TARGET == "jazzy" ]]; then 
+if [[ $TARGET == $JAZZY ]]; then 
     if $CUDAGL_ENABLED; then
         BASE_IMAGE=$BASE_IMAGE_JAZZY_CUDAGL
     else
         BASE_IMAGE=$BASE_IMAGE_JAZZY
     fi
-    ROBOT=$XARM
-elif [ $TARGET == "noetic" ]; then
+    VALID_ROBOT_OPTIONS=("${ROBOT_OPTIONS_JAZZY[@]}")
+elif [ $TARGET == $NOETIC ]; then
     if $CUDAGL_ENABLED; then
         BASE_IMAGE=$BASE_IMAGE_NOETIC_CUDAGL
     else
         BASE_IMAGE=$BASE_IMAGE_NOETIC
     fi
-    ROBOT=$ROBOTONT
+    VALID_ROBOT_OPTIONS=("${ROBOT_OPTIONS_NOETIC[@]}")
 fi
 
+if [[ $ROBOT != "" && ! " ${VALID_ROBOT_OPTIONS[@]} " =~ " ${ROBOT} " ]]; then
+    echo "Error: Unsupported robot specified: $ROBOT"
+    echo "Valid robots for $TARGET: $(IFS=','; echo "${VALID_ROBOT_OPTIONS[*]}")"
+    exit 1
+fi
 
 if $CUDAGL_ENABLED; then
     IMAGE_TYPE="vgl"
@@ -86,11 +106,22 @@ docker build \
     --build-arg IMAGE_TYPE=$IMAGE_TYPE \
     "$BUILD_CONTEXT"
 
-if $BUILD_ROBOT_IMAGE; then
+if [[ $ROBOT != "" ]]; then
+    # build only the specified robot image
     echo "Building child image "$ROBOT:$TAG" from $IMAGE_NAME:$TAG..."
     docker build \
         -f "$TARGET/Dockerfile.$ROBOT" \
         -t "$ROBOT:$TAG" \
         --build-arg BASE_IMAGE=$IMAGE_NAME:$TAG \
         "$BUILD_CONTEXT"
+elif $BUILD_ROBOT_IMAGES; then
+    # build all robot images
+    for robot in "${VALID_ROBOT_OPTIONS[@]}"; do
+        echo "Building child image "$robot:$TAG" from $IMAGE_NAME:$TAG..."
+        docker build \
+            -f "$TARGET/Dockerfile.$robot" \
+            -t "$robot:$TAG" \
+            --build-arg BASE_IMAGE=$IMAGE_NAME:$TAG \
+            "$BUILD_CONTEXT"
+    done
 fi

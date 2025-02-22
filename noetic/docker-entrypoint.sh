@@ -21,7 +21,7 @@ echo "export ROS_MASTER_URI=http://localhost:11311" >> $HOME/.bashrc
 # **************************************
 # remrob.ut.ee settings
 # **************************************
-echo "ROS_MASTER=${ROS_MASTER}" > $HOME/.env
+echo "ROS_MASTER=${ROS_MASTER}" >> $HOME/.env
 echo "GIT_PAT=${GIT_PAT}" >> $HOME/.env
 echo "ROBOT_CELL=${ROBOT_CELL}" >> $HOME/.env
 

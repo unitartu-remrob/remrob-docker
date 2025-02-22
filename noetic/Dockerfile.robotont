@@ -39,5 +39,11 @@ RUN source /opt/ros/noetic/setup.bash && \
     catkin init && \
     catkin build
 
+RUN echo "source ${HOME}/catkin_ws/devel/setup.bash" >> $HOME/.bashrc
+
+COPY noetic/docker-entrypoint.sh /.docker-entrypoint.sh
+
 # must switch back to root for /sbin/init entrypoint
 USER root
+CMD [ "/sbin/init" ]
+ENTRYPOINT ["/.docker-entrypoint.sh"]

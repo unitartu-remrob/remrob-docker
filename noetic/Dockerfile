@@ -192,12 +192,8 @@ COPY common/scripts/env.sh /.env.sh
 RUN echo "source /.env.sh" >> $HOME/.bashrc
 RUN echo "XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR}" >> $HOME/.env
 
-COPY noetic/docker-entrypoint.sh /.docker-entrypoint.sh
-
 EXPOSE 5902
 
 VOLUME ["/sys/fs/cgroup"]
 STOPSIGNAL SIGRTMIN+3
-CMD [ "/sbin/init" ]
 
-ENTRYPOINT ["/.docker-entrypoint.sh"]
