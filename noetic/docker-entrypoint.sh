@@ -14,9 +14,7 @@ if [ -d /opt/VirtualGL ]; then
     echo "alias sudo='env -u LD_PRELOAD sudo'" >> $HOME/.bashrc
 fi
 
-echo "source /opt/ros/noetic/setup.bash" >> $HOME/.bashrc
 echo "export ROS_MASTER_URI=http://localhost:11311" >> $HOME/.bashrc
-
 
 # **************************************
 # remrob.ut.ee settings

@@ -216,6 +216,9 @@ COPY assets/forest_mist.jpg $HOME/Pictures/Wallpapers/
 RUN mkdir -p $HOME/.vnc
 COPY common/system/xstartup $HOME/.vnc/xstartup
 
+# source ROS overlay in bashrc
+RUN echo "source /opt/ros/jazzy/setup.bash" >> $HOME/.bashrc
+
 RUN chown -R $USER:$USER $HOME
 
 COPY common/scripts/env.sh /.env.sh

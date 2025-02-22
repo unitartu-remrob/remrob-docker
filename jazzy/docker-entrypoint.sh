@@ -14,9 +14,6 @@ if [ -d /opt/VirtualGL ]; then
     echo "alias sudo='env -u LD_PRELOAD sudo'" >> $HOME/.bashrc
 fi
 
-# source ROS overlay
-echo "source /opt/ros/jazzy/setup.bash" >> $HOME/.bashrc
-
 # **************************************
 # remrob.ut.ee settings
 # **************************************
