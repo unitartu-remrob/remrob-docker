@@ -210,7 +210,7 @@ RUN chown $USER:$USER $SCRIPTS/launch_camera.sh && \
 
 # GNOME customized config
 COPY jazzy/config/user-${IMAGE_TYPE} $HOME/.config/dconf/user
-COPY assets/forest_mist.jpg $HOME/Pictures/Wallpapers/
+# COPY assets/forest_mist.jpg $HOME/Pictures/Wallpapers/
 
 # Set up VNC
 RUN mkdir -p $HOME/.vnc

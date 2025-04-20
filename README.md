@@ -147,7 +147,7 @@ xhost +local:docker
 ### Limitations:
 
 - The containers are run with --cap-add=SYS_ADMIN in order to enable systemd, which is needed for Gnome (GDM).
-- Does not work with newer versions of Ubuntu 22.04 due systemd incompatibilites (see [this](https://github.com/geerlingguy/docker-ubuntu2004-ansible/issues/18))
+- Does not work with Ubuntu 22.04 due systemd incompatibilites (see [this](https://github.com/geerlingguy/docker-ubuntu2004-ansible/issues/18))
 
 &nbsp;&nbsp;
 
