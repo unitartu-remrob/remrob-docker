@@ -21,6 +21,7 @@ BUILD_ROBOT_IMAGES=true
 
 ROBOTONT="robotont"
 XARM="xarm"
+UR5="ur5"
 
 ROBOT_OPTIONS_NOETIC=(
     $ROBOTONT
@@ -29,6 +30,7 @@ ROBOT_OPTIONS_NOETIC=(
 ROBOT_OPTIONS_JAZZY=(
     $ROBOTONT
     $XARM
+    $UR5
 )
 
 usage() {

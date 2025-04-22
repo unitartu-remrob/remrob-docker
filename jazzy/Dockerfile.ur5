@@ -1,0 +1,34 @@
+ARG BASE_IMAGE=remrob:jazzy-cudagl
+FROM ${BASE_IMAGE}
+
+ARG USER=kasutaja
+ARG HOME=/home/${USER}
+
+SHELL ["/bin/bash", "-c"]
+
+RUN apt-get update -y \
+    && apt-get install -y --no-install-recommends \
+        ros-jazzy-ur-description \
+        ros-jazzy-ur
+
+# create ros2 workspace as a regular user
+USER ${USER}
+
+RUN mkdir -p $HOME/ros2_ws/src
+WORKDIR $HOME/ros2_ws/src
+RUN git clone -b ros2 https://github.com/UniversalRobots/Universal_Robots_ROS2_GZ_Simulation ur_simulation_gz
+
+RUN rosdep update \
+    && rosdep install -i --from-path . --rosdistro jazzy --ignore-src -y
+
+WORKDIR $HOME/ros2_ws
+RUN source /opt/ros/jazzy/setup.bash && \
+    colcon build --symlink-install
+RUN echo "source $HOME/ros2_ws/install/local_setup.bash" >> $HOME/.bashrc
+
+COPY jazzy/docker-entrypoint.sh /.docker-entrypoint.sh
+
+# must switch back to root for /sbin/init entrypoint
+USER root
+CMD [ "/sbin/init" ]
+ENTRYPOINT ["/.docker-entrypoint.sh"]
